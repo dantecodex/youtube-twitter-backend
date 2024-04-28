@@ -14,4 +14,10 @@ app.use(express.urlencoded({ extended: true, limit: "16kb" })); // To handle lon
 app.use(express.static("public")); // To store asset data in server probably in "public temp folder"
 app.use(cookieParser());
 
+//routes import
+import userRouter from "./routes/user_routes.js"
+
+//routes declaration
+app.use("/api/v1/users", userRouter)
+
 export { app }

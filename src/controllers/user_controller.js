@@ -8,7 +8,7 @@ import { ApiResponse } from "../utils/apiResponse.js";
 const registerUser = asyncHandler(async (req, res) => {
     // Get user detail from frontend aka POSTMAN
     const { fullName, email, username, password } = req.body
-    console.log(fullName, email, username, password);
+    // console.log(req.body.fullName);
 
     // Validation which is to check all password and email are in proper way like non-empty
     if (
@@ -18,7 +18,7 @@ const registerUser = asyncHandler(async (req, res) => {
     }
 
     // Check if User is already exist like username and email
-    const existedUser = User.findOne({
+    const existedUser = await User.findOne({
         $or: [{ username }, { email }]
     })
     if (existedUser) {
@@ -27,10 +27,15 @@ const registerUser = asyncHandler(async (req, res) => {
 
     // Files are available like {required: true} (images,avatar)
     const avatarLocalPath = req.files?.avatar[0]?.path;
-    const coverImageLocalPath = req.file?.coverImage[0]?.path;
+    // const coverImageLocalPath = req.files?.coverImage[0]?.path;
+
+    let coverImageLocalPath;
+    if(req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length>0) {
+        coverImageLocalPath = req.files.coverImage[0].path
+    }
 
     if (!avatarLocalPath) {
-        throw new ApiError(400, "Avatar file is required")
+        throw new ApiError(400, "Avatar file required")
     }
 
     // Upload to Cloudinary and check avatar is uploaded
@@ -62,10 +67,8 @@ const registerUser = asyncHandler(async (req, res) => {
     }
 
     // return response
-
     return res.status(201).json(
         new ApiResponse(200, createdUser, "User registered successfully"))
-
 
 })
 
